@@ -12,6 +12,7 @@
 #include <mutex>
 #include <thread>
 #include <unordered_map>
+#include <iostream>
 
 static void zeros(std::ofstream & file, size_t n) {
     char zero = 0;
@@ -525,7 +526,7 @@ static void llama_model_quantize_impl(const std::string & fname_inp, const std::
         auto v = (std::vector<llama_model_kv_override>*)params->kv_overrides;
         kv_overrides = v->data();
     }
-
+    std::cout << "+++++++++++++++++++++QUANTU++++++++++++++++++++++" << std::endl;
     std::vector<std::string> splits = {};
     llama_model_loader ml(fname_inp, splits, use_mmap, /*check_tensors*/ true, kv_overrides);
     ml.init_mappings(false); // no prefetching

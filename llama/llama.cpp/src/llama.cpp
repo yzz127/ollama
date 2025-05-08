@@ -25,6 +25,7 @@
 #include <cstring>
 #include <ctime>
 #include <functional>
+#include <iostream>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4244 4267) // possible loss of data
@@ -40,6 +41,8 @@ static int llama_model_load(const std::string & fname, std::vector<std::string> 
     model.t_start_us = tm.t_start_us;
 
     try {
+	std::cout << "=====================================+++++++++++++++++++++++" << std::endl;
+	std::cout << fname << std::endl;
         llama_model_loader ml(fname, splits, params.use_mmap, params.check_tensors, params.kv_overrides);
 
         ml.print_info();

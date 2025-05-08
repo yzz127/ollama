@@ -61,6 +61,8 @@ func BackendInit() {
 }
 
 func GetModelArch(modelPath string) (string, error) {
+	fmt.Println(modelPath)
+	fmt.Println("==============================getmodelarch==================")
 	mp := C.CString(modelPath)
 	defer C.free(unsafe.Pointer(mp))
 
@@ -237,6 +239,7 @@ func LoadModelFromFile(modelPath string, params ModelParams) (*Model, error) {
 		cparams.progress_callback_user_data = unsafe.Pointer(&handle)
 	}
 
+	fmt.Println("XXXXXXXXXXXXXXXXXXXXXXXXXX LoadModelFromFile XXXXXXXXXXXXXXXXXXXX")
 	m := Model{c: C.llama_model_load_from_file(C.CString(modelPath), cparams)}
 	if m.c == nil {
 		return nil, fmt.Errorf("unable to load model: %s", modelPath)
@@ -485,6 +488,7 @@ func Quantize(infile, outfile string, ftype uint32) error {
 	params.nthread = -1
 	params.ftype = ftype
 
+	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Quantize xxxxxxxxxxxxxxxxxxxxx")
 	if rc := C.llama_model_quantize(cinfile, coutfile, &params); rc != 0 {
 		return fmt.Errorf("llama_model_quantize: %d", rc)
 	}

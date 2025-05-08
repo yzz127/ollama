@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	fmt.Println("=========================Calling cmd runner==================")
+	fmt.Println(os.Args[1:])
 	if err := runner.Execute(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		os.Exit(1)

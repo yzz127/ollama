@@ -31,6 +31,10 @@ import (
 	"github.com/ollama/ollama/fs/ggml"
 	"github.com/ollama/ollama/llama"
 	"github.com/ollama/ollama/model"
+
+	"github.com/intel/trustauthority-client/go-connector"
+
+	"crypto/tls"
 )
 
 type LlamaServer interface {
@@ -81,6 +85,48 @@ type llmServer struct {
 // maxArraySize. If maxArraySize is 0, the default value of 1024 is used. If
 // the maxArraySize is negative, all arrays are collected.
 func LoadModel(model string, maxArraySize int) (*ggml.GGML, error) {
+	fmt.Println("xxxxxxxxxxxxxxx Enable ITA attestation before model loading xxxxxxxxxxxxxxxx")
+
+	cfg := connector.Config{
+                // The Intel Trust Authority base URL.
+                BaseUrl: "",
+                // The Intel Trust Authority API URL.
+                ApiUrl: "",
+                // Provide TLS config.
+                TlsCfg: &tls.Config{},
+                // Replace TRUSTAUTHORITY_API_KEY with a real API key.
+                ApiKey: "",
+                // Provide Retry config
+                RetryConfig: &connector.RetryConfig{},
+        }
+
+	conn, err := connector.New(&cfg)
+
+	if err != nil {
+        	log.Fatal(err)
+        }
+
+
+        //quote, err := base64.StdEncoding.DecodeString(b64_quote)
+
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        evidence := map[string]interface{}{}
+        tdxquote := map[string]interface{}{}
+        tdxquote["quote"] = b64_quote
+
+        evidence["tdx"] = tdxquote
+
+        resp, err := conn.AttestEvidence(evidence, "", "")
+
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        fmt.Printf("Response from TA: %+v\n", resp)
+
 	if _, err := os.Stat(model); err != nil {
 		return nil, err
 	}
@@ -269,6 +315,7 @@ func NewLlamaServer(gpus discover.GpuInfoList, modelPath string, f *ggml.GGML, a
 		exe = eval
 	}
 
+	fmt.Println("ssssssssssssssssssssssssssssssssssss Server ssssssssssssssssssssssss")
 	var llamaModel *llama.Model
 	var textProcessor model.TextProcessor
 	if envconfig.NewEngine() || f.KV().OllamaEngineRequired() {

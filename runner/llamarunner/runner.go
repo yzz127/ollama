@@ -760,6 +760,7 @@ func (s *Server) loadModel(
 	threads int,
 	multiUserCache bool,
 ) {
+	fmt.Println("+++++++++++++++++++++++++++++Calling LoadModel++++++++++++++++++++++++")
 	var err error
 	s.model, err = llama.LoadModelFromFile(mpath, params)
 	if err != nil {

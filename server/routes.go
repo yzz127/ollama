@@ -93,6 +93,7 @@ func (s *Server) scheduleRunner(ctx context.Context, name string, caps []Capabil
 	}
 
 	model, err := GetModel(name)
+	fmt.Println("CALLING GET MODEL")
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -670,6 +671,7 @@ func (s *Server) PushHandler(c *gin.Context) {
 // with each part found. If no parts are found, the input name is returned as
 // is.
 func getExistingName(n model.Name) (model.Name, error) {
+	fmt.Println("================= getExistingName =================")
 	var zero model.Name
 	existing, err := Manifests(true)
 	if err != nil {
@@ -808,6 +810,8 @@ func GetModelInfo(req api.ShowRequest) (*api.ShowResponse, error) {
 	}
 
 	manifest, err := ParseNamedManifest(name)
+	fmt.Println("=================zzz")
+	fmt.Println(manifest)
 	if err != nil {
 		return nil, err
 	}
