@@ -33,8 +33,11 @@ import (
 	"github.com/ollama/ollama/model"
 
 	"github.com/intel/trustauthority-client/go-connector"
+	"github.com/intel/trustauthority-client/go-tpm"
+	"github.com/intel/trustauthority-client/go-aztdx"
 
 	"crypto/tls"
+	"encoding/base64"
 )
 
 type LlamaServer interface {
@@ -91,7 +94,7 @@ func LoadModel(model string, maxArraySize int) (*ggml.GGML, error) {
                 // The Intel Trust Authority base URL.
                 BaseUrl: "",
                 // The Intel Trust Authority API URL.
-                ApiUrl: "",
+		ApiUrl: "",
                 // Provide TLS config.
                 TlsCfg: &tls.Config{},
                 // Replace TRUSTAUTHORITY_API_KEY with a real API key.
@@ -109,15 +112,30 @@ func LoadModel(model string, maxArraySize int) (*ggml.GGML, error) {
 
         //quote, err := base64.StdEncoding.DecodeString(b64_quote)
 
-        if err != nil {
-                log.Fatal(err)
-        }
+	tpmFactory := tpm.NewTpmFactory()
+	//tpmAdapterFactory := tpm.NewTpmAdapterFactory(tpmFactory)
+	tdxAdapter, err := aztdx.NewAzureTdxAdapter(tpmFactory, nil)
+	//var builderOptions []connector.EvidenceBuilderOption
 
+
+	//evidenceBuilder, err := connector.NewEvidenceBuilder(builderOptions...)
+	//if err != nil {
+	//	return err
+	//}
+
+	tdxevidence, err := tdxAdapter.CollectEvidence(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//m, ok := tdxevidence.(map[string]interface{})
+	//fmt.Println(tdxevidence.Evidence)
+	encodedString := base64.StdEncoding.EncodeToString(tdxevidence.Evidence)
         evidence := map[string]interface{}{}
         tdxquote := map[string]interface{}{}
-        tdxquote["quote"] = b64_quote
+        tdxquote["quote"] = encodedString
 
         evidence["tdx"] = tdxquote
+	fmt.Println(evidence)
 
         resp, err := conn.AttestEvidence(evidence, "", "")
 
